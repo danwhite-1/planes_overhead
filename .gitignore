@@ -1,0 +1,4 @@
+# For flight_retriever
+flight_retriever/bin
+flight_retriever/obj
+flight_retriever/app.config
