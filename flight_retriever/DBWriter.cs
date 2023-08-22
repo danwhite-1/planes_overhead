@@ -1,7 +1,7 @@
 using MySqlConnector;
 using System.Configuration;
 
-namespace PlanesOverhead
+namespace FlightRetriever
 {
     public class DBWriter
     {
@@ -10,10 +10,10 @@ namespace PlanesOverhead
             // TODO make these be read externally
             var builder = new MySqlConnectionStringBuilder
             {
-                Server = ConfigurationManager.AppSettings["host"],
-                UserID = ConfigurationManager.AppSettings["user"],
-                Password = ConfigurationManager.AppSettings["password"],
-                Database = ConfigurationManager.AppSettings["database"],
+                Server = Environment.GetEnvironmentVariable("HOST"),
+                UserID = Environment.GetEnvironmentVariable("USER"),
+                Password = Environment.GetEnvironmentVariable("PW"),
+                Database = Environment.GetEnvironmentVariable("DB"),
             };
 
             conn = new MySqlConnection(builder.ConnectionString);

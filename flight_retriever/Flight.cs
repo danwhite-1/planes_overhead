@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 
-namespace PlanesOverhead
+namespace FlightRetriever
 {
     public class Flight
     {
