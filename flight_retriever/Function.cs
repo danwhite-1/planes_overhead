@@ -26,7 +26,7 @@ public class Function
         RequestSearchZones(runtime_ts);
 
         // TODO: Make this function report success or failure
-        return "test_str";
+        return "{ statusCode : 200 }";
     }
 
     static async Task<string> GetAllPlanes()
