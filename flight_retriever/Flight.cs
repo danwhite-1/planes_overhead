@@ -12,8 +12,8 @@ namespace FlightRetriever
                 Origin_country = state[2]?.GetValue<string>();
                 Timestamp = state[3]?.GetValue<int>();
                 Last_contact = state[4]?.GetValue<int>();
-                Latitude = state[5]?.GetValue<float>();
-                Longitude = state[6]?.GetValue<float>();
+                Longitude = state[5]?.GetValue<double>();
+                Latitude = state[6]?.GetValue<double>();
                 Baro_altitude = state[7]?.GetValue<float>();
                 On_ground = state[8]?.GetValue<bool>();
                 Velocity = state[9]?.GetValue<float>();
@@ -38,8 +38,8 @@ namespace FlightRetriever
         public string? Origin_country { get; private set; }
         public int? Timestamp { get; private set; }
         public int? Last_contact { get; private set; }
-        public float? Latitude { get; private set; }
-        public float? Longitude { get; private set; }
+        public double? Latitude { get; private set; }
+        public double? Longitude { get; private set; }
         public float? Baro_altitude { get; private set; }
         public bool? On_ground { get; private set; }
         public float? Velocity { get; private set; }
@@ -66,8 +66,8 @@ namespace FlightRetriever
                                  MemberToString<string>(nameof(Origin_country), Origin_country!) +
                                  MemberToString<int?>(nameof(Timestamp), Timestamp) +
                                  MemberToString<int?>(nameof(Last_contact), Last_contact) +
-                                 MemberToString<float?>(nameof(Latitude), Latitude) +
-                                 MemberToString<float?>(nameof(Longitude), Longitude) +
+                                 MemberToString<double?>(nameof(Latitude), Latitude) +
+                                 MemberToString<double?>(nameof(Longitude), Longitude) +
                                  MemberToString<float?>(nameof(Baro_altitude), Baro_altitude) +
                                  MemberToString<bool?>(nameof(On_ground), On_ground) +
                                  MemberToString<float?>(nameof(Velocity), Velocity) +
