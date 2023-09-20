@@ -30,7 +30,7 @@ public class ZoneSearcher
         {
             foreach (var zone in zones)
             {
-                GeoCoordinate flight_pos = new GeoCoordinate(flight.Latitude.Value, flight.Longitude.Value);
+                GeoCoordinate flight_pos = new GeoCoordinate(flight.Latitude, flight.Longitude);
                 var distance = zone.Point.GetDistanceTo(flight_pos);
                 if (distance <= zone.Distance)
                 {
