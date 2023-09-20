@@ -5,6 +5,7 @@ namespace FlightLib;
 
 public class Flight
 {
+    //! Constructor to be used to construct a flight from opensky API return
     public Flight(JsonNode state)
     {
         try {
@@ -13,8 +14,8 @@ public class Flight
             Origin_country = state[2]?.GetValue<string>();
             Timestamp = state[3]?.GetValue<int>();
             Last_contact = state[4]?.GetValue<int>();
-            Latitude = state[5]?.GetValue<double>();
-            Longitude = state[6]?.GetValue<double>();
+            Latitude = state[5]!.GetValue<double>();
+            Longitude = state[6]!.GetValue<double>();
             Baro_altitude = state[7]?.GetValue<float>();
             On_ground = state[8]?.GetValue<bool>();
             Velocity = state[9]?.GetValue<float>();
@@ -34,6 +35,7 @@ public class Flight
         }
     }
 
+    //! Constructor to be used to construct a flight from a DB read
     public Flight(MySqlDataReader reader)
     {
         try {
@@ -75,8 +77,8 @@ public class Flight
     public string? Origin_country { get; private set; }
     public int? Timestamp { get; private set; }
     public int? Last_contact { get; private set; }
-    public double? Latitude { get; private set; }
-    public double? Longitude { get; private set; }
+    public double Latitude { get; private set; }
+    public double Longitude { get; private set; }
     public float? Baro_altitude { get; private set; }
     public bool? On_ground { get; private set; }
     public float? Velocity { get; private set; }

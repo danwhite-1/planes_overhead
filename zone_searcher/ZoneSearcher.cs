@@ -23,11 +23,9 @@ public class ZoneSearcher
 
         Db = new DBAccess();
         var flights = Db.GetAllFlightsForTimestamp(ts_l);
-
         var zones = Db.GetAllSearchZones();
 
         List<ZoneMatch> matches = new();
-
         foreach (var flight in flights)
         {
             foreach (var zone in zones)
@@ -37,7 +35,6 @@ public class ZoneSearcher
                 if (distance <= zone.Distance)
                 {
                     matches.Add(new ZoneMatch(flight, zone));
-                    Console.WriteLine("We have a match " + flight.Callsign);
                 }
             }
         }

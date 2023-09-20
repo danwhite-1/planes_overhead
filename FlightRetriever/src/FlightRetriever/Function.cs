@@ -10,7 +10,22 @@ namespace FlightRetriever;
 
 public class Function
 {
+    // Main to allow local debugging
+    // Add `<OutputType>Exe</OutputType>` to the <PropertyGroup>
+    // Run with `dotnet run --project FlightRetriever.csproj`
+    public static async Task Main(string[] args)
+    {
+        await DoWork();
+    }
+
+    // The cloud deployment uses this function
+    // Create zip for deployment using `dotnet lambda deploy-function FlightRetriever --region eu-north-1`
     public async Task<string> FunctionHandler(string input, ILambdaContext context)
+    {
+        return await DoWork();
+    }
+
+    static async Task<string> DoWork()
     {
         JsonNode api_resp = JsonNode.Parse(await GetAllPlanes())!;
         JsonNode states = api_resp["states"]!;
@@ -20,8 +35,12 @@ public class Function
         dbw.CreateFlightTable(runtime_ts); // DANIEL - fix this later
         var flights = new List<Flight>();
 
+        // Each state is an array of values
         foreach (var state in states.AsArray()!)
         {
+            // If we don't know either the lat or long then don't add this flight
+            if (state![4] == null || state![5] == null) { continue; }
+
             flights.Add(new Flight(state!));
         }
 
