@@ -13,16 +13,11 @@ public class ZoneSearcher
 
     public string SearchZones()
     {
-        long ts_l;
-        try {
-            ts_l = long.Parse(Timestamp);
-        }
-        catch (Exception) {
-            return "ERROR";
-        }
+        var validInput = long.TryParse(Timestamp, out long timestamp_l);
+        if (!validInput) { return "ERROR"; }
 
         Db = new DBAccess();
-        var flights = Db.GetAllFlightsForTimestamp(ts_l);
+        var flights = Db.GetAllFlightsForTimestamp(timestamp_l);
         var zones = Db.GetAllSearchZones();
 
         List<ZoneMatch> matches = new();
@@ -40,7 +35,6 @@ public class ZoneSearcher
         }
 
         Db.WriteZoneMatchesToDB(matches);
-
         return "SUCCESS";
     }
 
