@@ -11,6 +11,6 @@ public class ZoneSearchController : ControllerBase
     {
         var searcher = new ZoneSearcher(ts);
         var res = searcher.SearchZones();
-        return Content(res);
+        return Content(res, "application/json");
     }
 }
