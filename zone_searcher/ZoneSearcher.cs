@@ -17,7 +17,7 @@ public class ZoneSearcher
         var validInput = long.TryParse(Timestamp, out long timestamp_l);
         if (!validInput) { return ConstructErrResp(400, "The provided ts is not valid."); }
 
-        Db = new DBAccess();
+        DBAccess Db = new DBAccess();
 
         var flights = Db.GetAllFlightsForTimestamp(timestamp_l);
         if (flights.Count == 0) { return ConstructErrResp(400, "No flights found for provided timestamp."); }
@@ -54,7 +54,6 @@ public class ZoneSearcher
         return r.toJsonStr();
     }
 
-    public DBAccess? Db { get; set; }
     public string Timestamp { get; set; }
 }
 
