@@ -32,7 +32,6 @@ public class Function
 
         long runtime_ts = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var dbw = new DBAccess();
-        dbw.CreateFlightTable(runtime_ts); // DANIEL - fix this later
         var flights = new List<Flight>();
 
         // Each state is an array of values

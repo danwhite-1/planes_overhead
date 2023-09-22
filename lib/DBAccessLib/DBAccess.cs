@@ -19,14 +19,7 @@ public class DBAccess
         conn = new MySqlConnection(builder.ConnectionString);
         conn.Open();
 
-        try
-        {
-            CreateZoneMatchTable();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-        }
+        VerifyTablesExist();
     }
 
     public void WriteFlightsToDB(List<Flight> flights, long timestamp)
@@ -64,7 +57,7 @@ public class DBAccess
         Console.WriteLine($"{rows} written to db. Number of flights: {flights.Count}");
     }
 
-    public void CreateFlightTable(long timestamp)
+    public void CreateFlightTable()
     {
         string createTable_sql = @$"CREATE TABLE IF NOT EXISTS `flights`
 (
@@ -92,7 +85,6 @@ PRIMARY KEY (flightid)
 );";
 
         var cmd = new MySqlCommand(createTable_sql, conn);
-        cmd.Parameters.AddWithValue("@timestamp", timestamp);
         cmd.ExecuteNonQuery();
 
         string checkExists_sql = $"SELECT COUNT(*) FROM information_schema.tables WHERE table_name='flights'";
@@ -172,6 +164,35 @@ PRIMARY KEY (zonematchid)
         if (Convert.ToInt16(rows) != 1)
         {
             throw new Exception("zonematches table not able to be created");
+        }
+    }
+
+    // TODO: Fix line endings for this function
+    public void VerifyTablesExist()
+    {
+        var tableMap = new Dictionary<string, Action>()
+        {
+            { "flights", () => CreateFlightTable() },
+            { "zonematches", () => CreateZoneMatchTable() },
+        };
+
+        foreach(KeyValuePair<string, Action> table in tableMap)
+        {
+            MySqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "SHOW TABLES LIKE '@table'";
+            cmd.Parameters.AddWithValue("@table", table.Key);
+            cmd.Prepare();
+
+            if (cmd.ExecuteNonQuery() > 0) { continue; }
+
+            try
+            {
+                table.Value();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
     }
 
