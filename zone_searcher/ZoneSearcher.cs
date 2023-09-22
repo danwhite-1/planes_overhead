@@ -18,7 +18,10 @@ public class ZoneSearcher
         if (!validInput) { return ConstructErrResp(400, "The provided ts is not valid."); }
 
         Db = new DBAccess();
+
         var flights = Db.GetAllFlightsForTimestamp(timestamp_l);
+        if (flights.Count == 0) { return ConstructErrResp(400, "No flights found for provided timestamp."); }
+
         var zones = Db.GetAllSearchZones();
 
         List<ZoneMatch> matches = new();
@@ -36,7 +39,6 @@ public class ZoneSearcher
         }
 
         Db.WriteZoneMatchesToDB(matches);
-        Console.WriteLine($"Number of matches found: {matches.Count}");
         return ConstructSuccessResp(matches.Count, flights.Count);
     }
 
@@ -79,5 +81,5 @@ public struct Response
     public int code;
     public int matchesFound;
     public int flightsChecked;
-    public string errMsg;
+    public string errMsg = "";
 }
