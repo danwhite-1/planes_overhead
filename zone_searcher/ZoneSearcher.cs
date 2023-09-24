@@ -5,19 +5,14 @@ using SearchZoneLib;
 
 namespace zone_searcher;
 
-public class ZoneSearcher
+public static class ZoneSearcher
 {
-    public ZoneSearcher(string ts)
+    public static string SearchZones(string timestamp)
     {
-        Timestamp = ts;
-    }
-
-    public string SearchZones()
-    {
-        var validInput = long.TryParse(Timestamp, out long timestamp_l);
+        var validInput = long.TryParse(timestamp, out long timestamp_l);
         if (!validInput) { return ConstructErrResp(400, "The provided ts is not valid."); }
 
-        DBAccess Db = new DBAccess();
+        DBAccess Db = new();
 
         var flights = Db.GetAllFlightsForTimestamp(timestamp_l);
         if (flights.Count == 0) { return ConstructErrResp(400, "No flights found for provided timestamp."); }
@@ -29,7 +24,7 @@ public class ZoneSearcher
         {
             foreach (var zone in zones)
             {
-                GeoCoordinate flight_pos = new GeoCoordinate(flight.Latitude, flight.Longitude);
+                GeoCoordinate flight_pos = new (flight.Latitude, flight.Longitude);
                 var distance = zone.Point.GetDistanceTo(flight_pos);
                 if (distance <= zone.Distance)
                 {
@@ -42,19 +37,17 @@ public class ZoneSearcher
         return ConstructSuccessResp(matches.Count, flights.Count);
     }
 
-    public string ConstructErrResp(int code, string errMsg)
+    public static string ConstructErrResp(int code, string errMsg)
     {
-        Response r = new Response(code, errMsg);
+        Response r = new(code, errMsg);
         return r.toJsonStr();
     }
 
-    public string ConstructSuccessResp(int matchesFound, int flightsChecked)
+    public static string ConstructSuccessResp(int matchesFound, int flightsChecked)
     {
-        Response r = new Response(200, matchesFound, flightsChecked);
+        Response r = new(200, matchesFound, flightsChecked);
         return r.toJsonStr();
     }
-
-    public string Timestamp { get; set; }
 }
 
 public struct Response

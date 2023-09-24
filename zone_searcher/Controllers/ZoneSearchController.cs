@@ -9,8 +9,7 @@ public class ZoneSearchController : ControllerBase
     [HttpGet]
     public ActionResult Index(string ts)
     {
-        var searcher = new ZoneSearcher(ts);
-        var res = searcher.SearchZones();
+        var res = ZoneSearcher.SearchZones(ts);
         return Content(res, "application/json");
     }
 }
