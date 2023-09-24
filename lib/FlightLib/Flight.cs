@@ -14,8 +14,8 @@ public class Flight
             Origin_country = state[2]?.GetValue<string>();
             Timestamp = state[3]?.GetValue<int>();
             Last_contact = state[4]?.GetValue<int>();
-            Latitude = state[5]!.GetValue<double>();
-            Longitude = state[6]!.GetValue<double>();
+            Longitude = state[5]!.GetValue<double>();
+            Latitude = state[6]!.GetValue<double>();
             Baro_altitude = state[7]?.GetValue<float>();
             On_ground = state[8]?.GetValue<bool>();
             Velocity = state[9]?.GetValue<float>();
