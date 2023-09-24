@@ -105,11 +105,30 @@ PRIMARY KEY (flightid)
         cmd.CommandText = "SELECT flightid, transponderid, callsign, latitude, longitude, baro_altitude, on_ground, velocity, vertical_rate, geo_altitude, squak FROM flights WHERE query_timestamp=@ts";
         cmd.Parameters.AddWithValue("@ts",ts);
 
-        List<Flight> flights = new List<Flight>();
+        List<Flight> flights = new();
         MySqlDataReader reader = cmd.ExecuteReader();
         while (reader.Read())
         {
-            flights.Add(new Flight(reader));
+            try {
+                var id = getValueFromReaderNullSafe<int>(reader, 0);
+                var transponderId = getValueFromReaderNullSafeStr(reader, 1);
+                var callsign = getValueFromReaderNullSafeStr(reader, 2);
+                var latitude = getValueFromReaderNullSafe<double>(reader, 3);
+                var longitude =  getValueFromReaderNullSafe<double>(reader, 4);
+                var baro_altitude = getValueFromReaderNullSafe<float>(reader, 5);
+                var on_ground = getValueFromReaderNullSafe<bool>(reader, 6);
+                var velocity = getValueFromReaderNullSafe<float>(reader, 7);
+                var vertical_rate = getValueFromReaderNullSafe<float>(reader, 8);
+                var geo_altitude = getValueFromReaderNullSafe<float>(reader, 9);
+                var squak = getValueFromReaderNullSafeStr(reader, 10);
+                flights.Add(new Flight(id, transponderId, callsign, latitude, longitude, baro_altitude, on_ground, velocity, vertical_rate, geo_altitude, squak));
+            }
+            catch (FormatException fe) {
+                Console.WriteLine($"Format exception encountered: {fe.Message}");
+            }
+            catch (InvalidOperationException ioe) {
+                Console.WriteLine($"Invalid operation exception encountered: {ioe.Message}");
+            }
         }
         reader.Close();
 
@@ -210,7 +229,6 @@ PRIMARY KEY (searchzoneid)
         }
     }
 
-    // TODO: Fix line endings for this function
     public void VerifyTablesExist()
     {
         var tableMap = new Dictionary<string, Action>()

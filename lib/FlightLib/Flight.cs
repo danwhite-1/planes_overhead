@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Nodes;
-using MySqlConnector;
 
 namespace FlightLib;
 
@@ -36,20 +35,20 @@ public class Flight
     }
 
     //! Constructor to be used to construct a flight from a DB read
-    public Flight(MySqlDataReader reader)
+    public Flight(int id, string transponderId, string callsign, double latitude, double longitude, float baro_altitude, bool on_ground, float velocity, float vertical_rate, float geo_altitude, string squak)
     {
         try {
-            Id = getValueFromReaderNullSafe<int>(reader, 0);
-            TransponderId = getValueFromReaderNullSafeStr(reader, 1);
-            Callsign =  getValueFromReaderNullSafeStr(reader, 2);
-            Latitude = getValueFromReaderNullSafe<double>(reader, 3);
-            Longitude =  getValueFromReaderNullSafe<double>(reader, 4);
-            Baro_altitude =  getValueFromReaderNullSafe<float>(reader, 5);
-            On_ground = getValueFromReaderNullSafe<bool>(reader, 6);
-            Velocity =  getValueFromReaderNullSafe<float>(reader, 7);
-            Vertical_rate =  getValueFromReaderNullSafe<float>(reader, 8);
-            Geo_altitude = getValueFromReaderNullSafe<float>(reader, 9);
-            Squak = getValueFromReaderNullSafeStr(reader, 10);
+            Id = id;
+            TransponderId = transponderId;
+            Callsign =  callsign;
+            Latitude = latitude;
+            Longitude =  longitude;
+            Baro_altitude =  baro_altitude;
+            On_ground = on_ground;
+            Velocity =  velocity;
+            Vertical_rate =  vertical_rate;
+            Geo_altitude = geo_altitude;
+            Squak = squak;
         }
         catch (FormatException fe) {
             Console.WriteLine($"Format exception encountered: {fe.Message}");
@@ -57,18 +56,6 @@ public class Flight
         catch (InvalidOperationException ioe) {
             Console.WriteLine($"Invalid operation exception encountered: {ioe.Message}");
         }
-    }
-
-    // No default contructor for a string, we need a separate function for it
-    public string getValueFromReaderNullSafeStr(MySqlDataReader reader, int idx)
-    {
-        return reader.GetValue(idx) != DBNull.Value ? reader.GetString(idx) : "";
-    }
-
-    // We need to deal with lat/long better than this... 0.0 could be a valid value
-    public T getValueFromReaderNullSafe<T>(MySqlDataReader reader, int idx) where T : new()
-    {
-        return reader.GetValue(idx) != DBNull.Value ? reader.GetFieldValue<T>(idx) : new T();
     }
 
     public int? Id {get; private set;}
