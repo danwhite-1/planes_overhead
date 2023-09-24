@@ -28,8 +28,8 @@ public class DBAccess
     ///////////////////////////
     public void CreateFlightTable()
     {
-        string createTable_sql = @$"CREATE TABLE IF NOT EXISTS `flights`
-(
+        string t_name = "flights";
+        string t_schema = @"
 `flightid` INT NOT NULL AUTO_INCREMENT,
 `query_timestamp` BIGINT,
 `transponderid` VARCHAR(6),
@@ -50,65 +50,49 @@ public class DBAccess
 `spi` BOOLEAN,
 `position_source` INT,
 `category` INT,
-PRIMARY KEY (flightid)
-);";
+PRIMARY KEY (flightid)";
 
-        var cmd = new MySqlCommand(createTable_sql, conn);
-        cmd.ExecuteNonQuery();
-
-        string checkExists_sql = $"SELECT COUNT(*) FROM information_schema.tables WHERE table_name='flights'";
-        cmd = new MySqlCommand(checkExists_sql, conn);
-        var rows = cmd.ExecuteScalar();
-
-        if (Convert.ToInt16(rows) != 1)
-        {
-            throw new Exception("Flights table not able to be created");
-        }
+        CreateTable(t_name, t_schema);
     }
 
     public void CreateZoneMatchTable()
     {
-        string createTable_sql = @$"CREATE TABLE IF NOT EXISTS `zonematches`
-(
+        string t_name = "zonematches";
+        string t_schema = @"
 `zonematchid` INT NOT NULL AUTO_INCREMENT,
 `flightid` INT NOT NULL,
 `zoneid` INT NOT NULL,
-PRIMARY KEY (zonematchid)
-);";
+PRIMARY KEY (zonematchid)";
 
-        var cmd = new MySqlCommand(createTable_sql, conn);
-        cmd.ExecuteNonQuery();
-
-        string checkExists_sql = $"SELECT COUNT(*) FROM information_schema.tables WHERE table_name='zonematches'";
-        cmd = new MySqlCommand(checkExists_sql, conn);
-        var rows = cmd.ExecuteScalar();
-
-        if (Convert.ToInt16(rows) != 1)
-        {
-            throw new Exception("zonematches table not able to be created");
-        }
+        CreateTable(t_name, t_schema);
     }
 
     public void CreateSearchZonesTable()
     {
-        string createTable_sql = @$"CREATE TABLE IF NOT EXISTS `searchzones`
-(
+        string t_name = "searchzones";
+        string t_schema = @"
 `searchzoneid` INT NOT NULL AUTO_INCREMENT,
 `point` VARCHAR(40) NOT NULL,
 `distance` INT NOT NULL,
-PRIMARY KEY (searchzoneid)
-);";
+PRIMARY KEY (searchzoneid)";
+
+        CreateTable(t_name, t_schema);
+    }
+
+    public void CreateTable(string name, string schema)
+    {
+        string createTable_sql = @$"CREATE TABLE IF NOT EXISTS `{name}` ({schema});";
 
         var cmd = new MySqlCommand(createTable_sql, conn);
         cmd.ExecuteNonQuery();
 
-        string checkExists_sql = $"SELECT COUNT(*) FROM information_schema.tables WHERE table_name='searchzones'";
+        string checkExists_sql = $"SELECT COUNT(*) FROM information_schema.tables WHERE table_name='{name}'";
         cmd = new MySqlCommand(checkExists_sql, conn);
         var rows = cmd.ExecuteScalar();
 
         if (Convert.ToInt16(rows) != 1)
         {
-            throw new Exception("searchzones table not able to be created");
+            throw new Exception($"{name} table not able to be created");
         }
     }
 
