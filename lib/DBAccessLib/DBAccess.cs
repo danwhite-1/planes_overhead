@@ -1,4 +1,4 @@
-﻿using MySqlConnector;
+using MySqlConnector;
 using FlightLib;
 using SearchZoneLib;
 
@@ -24,6 +24,8 @@ public class DBAccess
 
     public void WriteFlightsToDB(List<Flight> flights, long timestamp)
     {
+        if (flights.Count == 0) { return; }
+
         string insert_sql = $"INSERT INTO flights(query_timestamp, transponderid, callsign, origin_country, timestamp, last_contact, latitude, longitude, baro_altitude, on_ground, velocity, true_track, vertical_rate, sensors, geo_altitude, squak, spi, position_source, category) VALUES";
         var cmd = new MySqlCommand(insert_sql, conn);
 
@@ -116,17 +118,35 @@ PRIMARY KEY (flightid)
 
     public List<SearchZone> GetAllSearchZones()
     {
-        List<SearchZone> sz = new List<SearchZone>();
+        MySqlCommand cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT * FROM searchzones;";
 
-        // Dummy data, this should be pulled from the DB
-        sz.Add(new SearchZone(1, "54.59711, -5.92729", 100000));
-        sz.Add(new SearchZone(1, "54.53232, -6.65310", 50000));
+        List<SearchZone> sz = new();
+        MySqlDataReader reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            try {
+                var id = getValueFromReaderNullSafe<int>(reader, 0);
+                var point = getValueFromReaderNullSafeStr(reader, 1);
+                var distance = getValueFromReaderNullSafe<int>(reader, 2);
+                sz.Add(new SearchZone(id, point, distance));
+            }
+            catch (FormatException fe) {
+                Console.WriteLine($"Format exception encountered: {fe.Message}");
+            }
+            catch (InvalidOperationException ioe) {
+                Console.WriteLine($"Invalid operation exception encountered: {ioe.Message}");
+            }
+        }
+        reader.Close();
 
         return sz;
     }
 
     public void WriteZoneMatchesToDB(List<ZoneMatch> zonematches)
     {
+        if (zonematches.Count == 0) { return; }
+
         string insert_sql = $"INSERT INTO zonematches(flightid, zoneid) VALUES";
         var cmd = new MySqlCommand(insert_sql, conn);
 
@@ -167,6 +187,29 @@ PRIMARY KEY (zonematchid)
         }
     }
 
+    public void CreateSearchZonesTable()
+    {
+        string createTable_sql = @$"CREATE TABLE IF NOT EXISTS `searchzones`
+(
+`searchzoneid` INT NOT NULL AUTO_INCREMENT,
+`point` VARCHAR(40) NOT NULL,
+`distance` INT NOT NULL,
+PRIMARY KEY (searchzoneid)
+);";
+
+        var cmd = new MySqlCommand(createTable_sql, conn);
+        cmd.ExecuteNonQuery();
+
+        string checkExists_sql = $"SELECT COUNT(*) FROM information_schema.tables WHERE table_name='searchzones'";
+        cmd = new MySqlCommand(checkExists_sql, conn);
+        var rows = cmd.ExecuteScalar();
+
+        if (Convert.ToInt16(rows) != 1)
+        {
+            throw new Exception("searchzones table not able to be created");
+        }
+    }
+
     // TODO: Fix line endings for this function
     public void VerifyTablesExist()
     {
@@ -174,6 +217,7 @@ PRIMARY KEY (zonematchid)
         {
             { "flights", () => CreateFlightTable() },
             { "zonematches", () => CreateZoneMatchTable() },
+            { "searchzones", () => CreateSearchZonesTable() },
         };
 
         foreach(KeyValuePair<string, Action> table in tableMap)
@@ -194,6 +238,18 @@ PRIMARY KEY (zonematchid)
                 Console.WriteLine(e.Message);
             }
         }
+    }
+
+    // No default contructor for a string, we need a separate function for it
+    public string getValueFromReaderNullSafeStr(MySqlDataReader reader, int idx)
+    {
+        return reader.GetValue(idx) != DBNull.Value ? reader.GetString(idx) : "";
+    }
+
+    // We need to deal with lat/long better than this... 0.0 could be a valid value
+    public T getValueFromReaderNullSafe<T>(MySqlDataReader reader, int idx) where T : new()
+    {
+        return reader.GetValue(idx) != DBNull.Value ? reader.GetFieldValue<T>(idx) : new T();
     }
 
     private readonly MySqlConnection conn;
