@@ -20,5 +20,5 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/sdk:7.0
 WORKDIR /app
 COPY --from=build-env /app/zone_searcher/out .
-EXPOSE 5000
-ENTRYPOINT ["dotnet", "zone_searcher.dll", "--urls", "http://0.0.0.0:5000"]
+EXPOSE 80
+ENTRYPOINT ["dotnet", "zone_searcher.dll", "--urls", "http://0.0.0.0:80"]
