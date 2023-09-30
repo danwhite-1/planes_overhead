@@ -1,5 +1,5 @@
 # Build image with: docker build -t planes_overhead/zone_searcher -f zone_searcher/Dockerfile .
-# Run with: docker run -p 5000:5000 --env-file=zone_searcher/docker.env planes_overhead/zone_searcher
+# Run with: docker run -p 5000:80 --env-file=zone_searcher/docker.env planes_overhead/zone_searcher
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-env
 WORKDIR /app
 
