@@ -19,7 +19,7 @@ public class Function
     }
 
     // The cloud deployment uses this function
-    // Create zip for deployment using `dotnet lambda deploy-function FlightRetriever --region eu-north-1`
+    // Create zip for deployment using `dotnet lambda package`
     public async Task<string> FunctionHandler(string input, ILambdaContext context)
     {
         return await DoWork();
@@ -83,6 +83,12 @@ public class Function
 
     static async Task<string> RequestSearchZones(long timestamp)
     {
-        return await MakeRequestGetStr("http://localhost:5000", $"timestamp?ts={timestamp}");
+        var zone_searcher_uri = Environment.GetEnvironmentVariable("ZONE_SEARCHER_URI");
+        if (!string.IsNullOrEmpty(zone_searcher_uri))
+        {
+            return await MakeRequestGetStr(zone_searcher_uri, $"timestamp?ts={timestamp}");
+        }
+
+        return "{\"errMsg\" : \"Env var ZONE_SEARCHER_URI does not exist\"}";
     }
 }
