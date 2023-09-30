@@ -9,6 +9,7 @@ public class DBAccess
     //! Constructor
     public DBAccess()
     {
+        // TODO: Verify env vars exist here, throw error if not
         var builder = new MySqlConnectionStringBuilder
         {
             Server = Environment.GetEnvironmentVariable("HOST"),
