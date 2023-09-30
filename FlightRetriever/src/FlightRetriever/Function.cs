@@ -44,23 +44,45 @@ public class Function
         }
 
         dbw.WriteFlightsToDB(flights, runtime_ts);
-        RequestSearchZones(runtime_ts);
+        var search_zone_resp = JsonNode.Parse(await RequestSearchZones(runtime_ts))!;
+
+        if (search_zone_resp["errMsg"]!.ToString() != "")
+        {
+            Console.WriteLine($"Zone searcher service hit error: {search_zone_resp["errMsg"]!}");
+        }
+        else
+        {
+            Console.WriteLine($"Called zone searcher service. Found {search_zone_resp["matchesFound"]!} matches");
+        }
 
         // TODO: Make this function report success or failure
         return "{ statusCode : 200 }";
     }
 
-    static async Task<string> GetAllPlanes()
+    static async Task<string> MakeRequestGetStr(string _base, string uri)
     {
-        HttpClient httpClient = new(){ BaseAddress = new Uri("https://opensky-network.org") };
-        using HttpResponseMessage response = await httpClient.GetAsync("api/states/all");
-        response.EnsureSuccessStatusCode();
-        return await response.Content.ReadAsStringAsync();
+        try
+        {
+            HttpClient httpClient = new(){ BaseAddress = new Uri(_base) };
+            using HttpResponseMessage response = await httpClient.GetAsync(uri);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error when making request to {_base}/{uri}: {ex.Message}");
+            Environment.Exit(1);
+            return ""; // Will never get here, keep the compiler happy
+        }
     }
 
-    // Stub function, yet to be implemented
-    static void RequestSearchZones(long timestamp)
+    static async Task<string> GetAllPlanes()
     {
-        Console.WriteLine($"Making request to zone search server for {timestamp}... Functionality not yet implemented");
+        return await MakeRequestGetStr("https://opensky-network.org", "api/states/all");
+    }
+
+    static async Task<string> RequestSearchZones(long timestamp)
+    {
+        return await MakeRequestGetStr("http://localhost:5000", $"timestamp?ts={timestamp}");
     }
 }
