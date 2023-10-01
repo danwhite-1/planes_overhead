@@ -7,21 +7,43 @@ namespace DBAccessLib;
 public class DBAccess
 {
     //! Constructor
+    //! Will throw if relevant env vars are not set
     public DBAccess()
     {
-        // TODO: Verify env vars exist here, throw error if not
+        var envVars = GetEnvVars();
         var builder = new MySqlConnectionStringBuilder
         {
-            Server = Environment.GetEnvironmentVariable("HOST"),
-            UserID = Environment.GetEnvironmentVariable("USER"),
-            Password = Environment.GetEnvironmentVariable("PW"),
-            Database = Environment.GetEnvironmentVariable("DB"),
+            Server = envVars["HOST"],
+            UserID = envVars["USER"],
+            Password = envVars["PW"],
+            Database = envVars["DB"],
         };
 
         conn = new MySqlConnection(builder.ConnectionString);
         conn.Open();
 
         VerifyTablesExist();
+    }
+
+    //! Get env variables and throw if not all available
+    public static Dictionary<string, string> GetEnvVars()
+    {
+        var env_vars = new Dictionary<string, string>{
+            {"HOST", Environment.GetEnvironmentVariable("HOST")!},
+            {"USER", Environment.GetEnvironmentVariable("USER")!},
+            {"PW", Environment.GetEnvironmentVariable("PW")!},
+            {"DB", Environment.GetEnvironmentVariable("DB")!},
+        };
+
+        foreach(KeyValuePair<string, string> env_var in env_vars)
+        {
+            if (string.IsNullOrEmpty(env_var.Value))
+            {
+                throw new Exception($"Env variable {env_var.Key} is not set");
+            }
+        }
+
+        return env_vars;
     }
 
     ///////////////////////////
