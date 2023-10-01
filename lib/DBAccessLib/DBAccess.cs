@@ -90,6 +90,17 @@ PRIMARY KEY (zonematchid)";
         CreateTable(t_name, t_schema);
     }
 
+    public void CreateUserTable()
+    {
+        string t_name = "users";
+        string t_schema = @"
+`userid` INT NOT NULL AUTO_INCREMENT,
+`email` VARCHAR(320),
+PRIMARY KEY (userid)";
+
+        CreateTable(t_name, t_schema);
+    }
+
     public void CreateSearchZonesTable()
     {
         string t_name = "searchzones";
@@ -97,7 +108,9 @@ PRIMARY KEY (zonematchid)";
 `searchzoneid` INT NOT NULL AUTO_INCREMENT,
 `point` VARCHAR(40) NOT NULL,
 `distance` INT NOT NULL,
-PRIMARY KEY (searchzoneid)";
+`userid` INT NOT NULL,
+PRIMARY KEY (searchzoneid),
+FOREIGN KEY (userid) REFERENCES users(userid)";
 
         CreateTable(t_name, t_schema);
     }
@@ -253,19 +266,20 @@ PRIMARY KEY (searchzoneid)";
     {
         var tableMap = new Dictionary<string, Action>()
         {
-            { "flights", () => CreateFlightTable() },
-            { "zonematches", () => CreateZoneMatchTable() },
-            { "searchzones", () => CreateSearchZonesTable() },
+            { "flights", CreateFlightTable },
+            { "zonematches", CreateZoneMatchTable },
+            { "users", CreateUserTable },
+            { "searchzones", CreateSearchZonesTable },
         };
 
         foreach(KeyValuePair<string, Action> table in tableMap)
         {
             MySqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SHOW TABLES LIKE '@table'";
+            cmd.CommandText = $"SELECT COUNT(*) FROM information_schema.tables WHERE table_name='{table.Key}'";;
             cmd.Parameters.AddWithValue("@table", table.Key);
             cmd.Prepare();
 
-            if (cmd.ExecuteNonQuery() > 0) { continue; }
+            if (Convert.ToInt16(cmd.ExecuteScalar()) != 0) { continue; }
 
             try
             {
