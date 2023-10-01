@@ -235,7 +235,7 @@ FOREIGN KEY (userid) REFERENCES users(userid)";
     public List<SearchZone> GetAllSearchZones()
     {
         MySqlCommand cmd = conn.CreateCommand();
-        cmd.CommandText = "SELECT * FROM searchzones;";
+        cmd.CommandText = "SELECT searchzoneid, point, distance, userid FROM searchzones;";
 
         List<SearchZone> sz = new();
         MySqlDataReader reader = cmd.ExecuteReader();
@@ -245,11 +245,13 @@ FOREIGN KEY (userid) REFERENCES users(userid)";
                 var id = getValueFromReaderNullSafe<int>(reader, 0);
                 var point = getValueFromReaderNullSafeStr(reader, 1);
                 var distance = getValueFromReaderNullSafe<int>(reader, 2);
-                sz.Add(new SearchZone(id, point, distance));
+                var userid = getValueFromReaderNullSafe<int>(reader, 3);
+                sz.Add(new SearchZone(id, point, distance, userid));
             }
             catch (FormatException fe) {
                 Console.WriteLine($"Format exception encountered: {fe.Message}");
             }
+            // Why are we catching this exception?
             catch (InvalidOperationException ioe) {
                 Console.WriteLine($"Invalid operation exception encountered: {ioe.Message}");
             }
@@ -257,6 +259,25 @@ FOREIGN KEY (userid) REFERENCES users(userid)";
         reader.Close();
 
         return sz;
+    }
+
+    public SearchZone GetSearchZoneById(int Id)
+    {
+        MySqlCommand cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT searchzoneid, point, distance, userid FROM searchzones WHERE searchzoneid=@Id";
+        cmd.Parameters.AddWithValue("@Id", Id);
+
+        MySqlDataReader reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            var id = getValueFromReaderNullSafe<int>(reader, 0);
+            var point = getValueFromReaderNullSafeStr(reader, 1);
+            var distance = getValueFromReaderNullSafe<int>(reader, 2);
+            var userid = getValueFromReaderNullSafe<int>(reader, 3);
+            return new SearchZone(id, point, distance, userid);
+        }
+
+        throw new Exception("No search zone for that Id exists.");
     }
 
     //////////////////////
@@ -275,7 +296,7 @@ FOREIGN KEY (userid) REFERENCES users(userid)";
         foreach(KeyValuePair<string, Action> table in tableMap)
         {
             MySqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = $"SELECT COUNT(*) FROM information_schema.tables WHERE table_name='{table.Key}'";;
+            cmd.CommandText = $"SELECT COUNT(*) FROM information_schema.tables WHERE table_name='@table'";;
             cmd.Parameters.AddWithValue("@table", table.Key);
             cmd.Prepare();
 

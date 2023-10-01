@@ -4,12 +4,13 @@ namespace SearchZoneLib;
 
 public class SearchZone
 {
-    public SearchZone(int id, string point, int distance)
+    public SearchZone(int id, string point, int distance, int userid)
     {
         Id = id;
         Distance = distance;
+        UserId = userid;
 
-        // DANIEL - need better error handling here
+        // TODO: Need better error handling here
         string[] point_parts = point.Split(',');
         Point = new GeoCoordinate(Convert.ToDouble(point_parts[0]), Convert.ToDouble(point_parts[1]));
     }
@@ -17,4 +18,5 @@ public class SearchZone
     public int Id { get; set; }
     public GeoCoordinate Point { get; set; }
     public int Distance { get; set; }
+    public int UserId { get; set; }
 }
