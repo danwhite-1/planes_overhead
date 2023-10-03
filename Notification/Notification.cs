@@ -1,6 +1,5 @@
 using DBAccessLib;
 using FlightLib;
-using SearchZoneLib;
 
 namespace Notification;
 
@@ -29,7 +28,9 @@ public static class Notifier
         foreach (var user in userFlightMap)
         {
             var flightInfo = db.GetFlightsByIds(user.Value);
-            Console.WriteLine(ConstructEmailString(flightInfo, timestamp));
+            // TODO: Get actual email from db
+            var email = new Email("test@test.com", "Planes Overhead Report", ConstructEmailString(flightInfo, timestamp));
+            SendEmail(email);
         }
 
         return "SUCCESS";
@@ -40,8 +41,27 @@ public static class Notifier
         string text = $"The following flights where detected in your search zone at {timestamp}";
         foreach (var flight in flightInfo)
         {
-            text = text + $"{Environment.NewLine}{flight.Callsign}\t{flight.Velocity}kts @ {flight.Geo_altitude}m";
+            text += $"{Environment.NewLine}{flight.Callsign}\t{flight.Velocity}kts @ {flight.Geo_altitude}m";
         }
         return text;
     }
+
+    public static void SendEmail(Email e)
+    {
+        // Stub function, not yet implemented
+    }
+}
+
+public struct Email
+{
+    public Email(string addr, string sub, string tex)
+    {
+        Address = addr;
+        Subject = sub;
+        Text = tex;
+    }
+
+    public string Address;
+    public string Subject;
+    public string Text;
 }
