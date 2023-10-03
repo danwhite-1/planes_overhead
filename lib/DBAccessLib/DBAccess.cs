@@ -362,10 +362,8 @@ WHERE flights.query_timestamp=@ts";
 
         foreach(KeyValuePair<string, Action> table in tableMap)
         {
-            MySqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = $"SELECT COUNT(*) FROM information_schema.tables WHERE table_name='@table'";;
-            cmd.Parameters.AddWithValue("@table", table.Key);
-            cmd.Prepare();
+            var checkExists_sql = $"SELECT COUNT(*) FROM information_schema.tables WHERE table_name='{table.Key}'";
+            var cmd = new MySqlCommand(checkExists_sql, conn);
 
             if (Convert.ToInt16(cmd.ExecuteScalar()) != 0) { continue; }
 
