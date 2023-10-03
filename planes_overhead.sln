@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zone_searcher", "zone_searc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightRetriever", "FlightRetriever\src\FlightRetriever\FlightRetriever.csproj", "{667B72F2-93FA-46F7-9F8A-0C279CEAEEB5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification", "Notification\Notification.csproj", "{636D604C-CE32-4805-A4A1-98F6D4BA36B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{667B72F2-93FA-46F7-9F8A-0C279CEAEEB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{667B72F2-93FA-46F7-9F8A-0C279CEAEEB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{667B72F2-93FA-46F7-9F8A-0C279CEAEEB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{636D604C-CE32-4805-A4A1-98F6D4BA36B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{636D604C-CE32-4805-A4A1-98F6D4BA36B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{636D604C-CE32-4805-A4A1-98F6D4BA36B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{636D604C-CE32-4805-A4A1-98F6D4BA36B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
