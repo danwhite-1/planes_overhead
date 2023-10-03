@@ -232,6 +232,49 @@ FOREIGN KEY (userid) REFERENCES users(userid)";
         return flights;
     }
 
+    public List<Flight> GetFlightsByIds(List<int> ids)
+    {
+        MySqlCommand cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT flightid, transponderid, callsign, latitude, longitude, baro_altitude, on_ground, velocity, vertical_rate, geo_altitude, squak FROM flights WHERE flightid IN (@id_list)";
+        cmd.Parameters.AddWithValue("@id_list", string.Join(", ", ids));
+
+        // There is a bug in mysqlconnector that causes the default string contruction to not give the expected results
+        // We can implement the subtituition manually to get around this.
+        string commandtext = cmd.CommandText;
+        foreach (MySqlParameter p in cmd.Parameters)
+            commandtext = commandtext.Replace(p.ParameterName, p.Value!.ToString());
+        cmd.CommandText = commandtext;
+
+        List<Flight> flights = new();
+        MySqlDataReader reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            try {
+                var id = getValueFromReaderNullSafe<int>(reader, 0);
+                var transponderId = getValueFromReaderNullSafeStr(reader, 1);
+                var callsign = getValueFromReaderNullSafeStr(reader, 2);
+                var latitude = getValueFromReaderNullSafe<double>(reader, 3);
+                var longitude =  getValueFromReaderNullSafe<double>(reader, 4);
+                var baro_altitude = getValueFromReaderNullSafe<float>(reader, 5);
+                var on_ground = getValueFromReaderNullSafe<bool>(reader, 6);
+                var velocity = getValueFromReaderNullSafe<float>(reader, 7);
+                var vertical_rate = getValueFromReaderNullSafe<float>(reader, 8);
+                var geo_altitude = getValueFromReaderNullSafe<float>(reader, 9);
+                var squak = getValueFromReaderNullSafeStr(reader, 10);
+                flights.Add(new Flight(id, transponderId, callsign, latitude, longitude, baro_altitude, on_ground, velocity, vertical_rate, geo_altitude, squak));
+            }
+            catch (FormatException fe) {
+                Console.WriteLine($"Format exception encountered: {fe.Message}");
+            }
+            catch (InvalidOperationException ioe) {
+                Console.WriteLine($"Invalid operation exception encountered: {ioe.Message}");
+            }
+        }
+        reader.Close();
+
+        return flights;
+    }
+
     public List<SearchZone> GetAllSearchZones()
     {
         MySqlCommand cmd = conn.CreateCommand();
@@ -278,6 +321,30 @@ FOREIGN KEY (userid) REFERENCES users(userid)";
         }
 
         throw new Exception("No search zone for that Id exists.");
+    }
+
+    public List<(int, int, int)> GetZoneMatchInfoForTimestamp(long ts)
+    {
+        MySqlCommand cmd = conn.CreateCommand();
+        cmd.CommandText = @$"SELECT users.userid, zonematches.zonematchid, flights.flightid FROM users
+JOIN searchzones ON users.userid=searchzones.userid
+JOIN zonematches ON searchzones.searchzoneid=zonematches.zoneid
+JOIN flights ON zonematches.flightid=flights.flightid
+WHERE flights.query_timestamp=@ts";
+        cmd.Parameters.AddWithValue("@ts", ts);
+
+        MySqlDataReader reader = cmd.ExecuteReader();
+        var rtn_list = new List<(int, int, int)>();
+        while (reader.Read())
+        {
+            var userid = getValueFromReaderNullSafe<int>(reader, 0);
+            var zonematchid = getValueFromReaderNullSafe<int>(reader, 1);
+            var flightid = getValueFromReaderNullSafe<int>(reader, 2);
+            rtn_list.Add((userid, zonematchid, flightid));
+        }
+        reader.Close();
+
+        return rtn_list;
     }
 
     //////////////////////
