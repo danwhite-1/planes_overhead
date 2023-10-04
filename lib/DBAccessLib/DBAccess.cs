@@ -347,6 +347,14 @@ WHERE flights.query_timestamp=@ts";
         return rtn_list;
     }
 
+    public string GetEmailAddressByUserId(int id)
+    {
+        MySqlCommand cmd = conn.CreateCommand();
+        cmd.CommandText = @$"SELECT email FROM users where userid={id}";
+
+        return Convert.ToString(cmd.ExecuteScalar())!;
+    }
+
     //////////////////////
     //! Utility Functions
     //////////////////////

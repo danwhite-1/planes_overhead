@@ -20,7 +20,7 @@ public static class Notifier
         {
             if (!userFlightMap.ContainsKey(zonematchi.Item1))
             {
-                userFlightMap.Add(zonematchi.Item1, new List<int>(zonematchi.Item3));
+                userFlightMap[zonematchi.Item1] = new List<int>{zonematchi.Item3};
             }
             else
             {
@@ -31,8 +31,14 @@ public static class Notifier
         foreach (var user in userFlightMap)
         {
             var flightInfo = db.GetFlightsByIds(user.Value);
-            // TODO: Get actual email from db
-            var email = new Email("test@test.com", "Planes Overhead Report", ConstructEmailString(flightInfo, timestamp));
+            var addr = db.GetEmailAddressByUserId(user.Key);
+            if (string.IsNullOrEmpty(addr))
+            {
+                Console.WriteLine($"Found empty email address for user: {user.Key}");
+                continue;
+            }
+
+            var email = new Email(addr, "Planes Overhead Report", ConstructEmailString(flightInfo, timestamp_l));
             SendEmail(email);
         }
 
@@ -40,9 +46,11 @@ public static class Notifier
         return GetResponseStr.ConstructSuccessResp(0, 0);
     }
 
-    public static string ConstructEmailString(List<Flight> flightInfo, string timestamp)
+    public static string ConstructEmailString(List<Flight> flightInfo, long timestamp)
     {
-        string text = $"The following flights where detected in your search zone at {timestamp}";
+        DateTime time = DateTimeOffset.FromUnixTimeSeconds(timestamp).DateTime;
+        string text = $"The following flights where detected in your search zone at {time.TimeOfDay} on {time.ToShortDateString()}:";
+
         foreach (var flight in flightInfo)
         {
             text += $"{Environment.NewLine}{flight.Callsign}\t{flight.Velocity}kts @ {flight.Geo_altitude}m";
@@ -52,7 +60,7 @@ public static class Notifier
 
     public static void SendEmail(Email e)
     {
-        // Stub function, not yet implemented
+        Console.WriteLine($"To: {e.Address}{Environment.NewLine}Subject: {e.Subject}{Environment.NewLine}{Environment.NewLine}{e.Text}");
     }
 }
 
