@@ -2,7 +2,7 @@
 
 namespace ResponseJsonLib;
 
-public struct Response
+public class Response
 {
     public Response(int _code, string _errMsg)
     {

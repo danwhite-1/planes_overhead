@@ -64,7 +64,7 @@ public static class Notifier
     }
 }
 
-public struct Email
+public class Email
 {
     public Email(string addr, string sub, string tex)
     {

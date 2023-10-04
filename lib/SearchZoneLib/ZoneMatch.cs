@@ -2,7 +2,7 @@ using FlightLib;
 
 namespace SearchZoneLib;
 
-public struct ZoneMatch
+public class ZoneMatch
 {
     public ZoneMatch(Flight f, SearchZone sz)
     {
