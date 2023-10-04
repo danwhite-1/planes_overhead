@@ -1,6 +1,8 @@
 using DBAccessLib;
 using FlightLib;
 using ResponseJsonLib;
+using System.Net.Mail;
+using System.Net;
 
 namespace Notification;
 
@@ -28,6 +30,7 @@ public static class Notifier
             }
         }
 
+        var emails = new List<Email>();
         foreach (var user in userFlightMap)
         {
             var flightInfo = db.GetFlightsByIds(user.Value);
@@ -38,9 +41,10 @@ public static class Notifier
                 continue;
             }
 
-            var email = new Email(addr, "Planes Overhead Report", ConstructEmailString(flightInfo, timestamp_l));
-            SendEmail(email);
+            emails.Add(new Email(addr, "Planes Overhead Report", ConstructEmailString(flightInfo, timestamp_l)));
         }
+
+        SendEmails(emails);
 
         // TODO: Update response class to version agnostic/innterface
         return GetResponseStr.ConstructSuccessResp(0, 0);
@@ -58,22 +62,17 @@ public static class Notifier
         return text;
     }
 
-    public static void SendEmail(Email e)
+    public static void SendEmails(List<Email> emails)
     {
-        Console.WriteLine($"To: {e.Address}{Environment.NewLine}Subject: {e.Subject}{Environment.NewLine}{Environment.NewLine}{e.Text}");
-    }
-}
+        var smtpServer = Environment.GetEnvironmentVariable("SMTP_SERVER");
+        var senderEmail = Environment.GetEnvironmentVariable("SENDER_EMAIL");
+        var emailPassword = Environment.GetEnvironmentVariable("EMAIL_PW");
+        if (string.IsNullOrEmpty(smtpServer) || string.IsNullOrEmpty(senderEmail) || string.IsNullOrEmpty(emailPassword))
+        {
+            throw new Exception("Not all environment vars set for SMTP");
+        }
 
-public class Email
-{
-    public Email(string addr, string sub, string tex)
-    {
-        Address = addr;
-        Subject = sub;
-        Text = tex;
+        var emailSender = new EmailSender(smtpServer, senderEmail, emailPassword);
+        emailSender.SendEmails(emails);
     }
-
-    public string Address;
-    public string Subject;
-    public string Text;
 }
