@@ -15,6 +15,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightRetriever", "FlightRe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification", "Notification\Notification.csproj", "{636D604C-CE32-4805-A4A1-98F6D4BA36B9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{92C609FA-F641-4070-B8DC-27C4ABC2850D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResponseJsonLib", "lib\ResponseJsonLib\ResponseJsonLib.csproj", "{2C69FF19-7820-449A-8083-321B981B8F19}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,5 +52,12 @@ Global
 		{636D604C-CE32-4805-A4A1-98F6D4BA36B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{636D604C-CE32-4805-A4A1-98F6D4BA36B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{636D604C-CE32-4805-A4A1-98F6D4BA36B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C69FF19-7820-449A-8083-321B981B8F19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C69FF19-7820-449A-8083-321B981B8F19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C69FF19-7820-449A-8083-321B981B8F19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C69FF19-7820-449A-8083-321B981B8F19}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2C69FF19-7820-449A-8083-321B981B8F19} = {92C609FA-F641-4070-B8DC-27C4ABC2850D}
 	EndGlobalSection
 EndGlobal

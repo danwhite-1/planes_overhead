@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.2" />
-    <PackageReference Include="Newtonsoft.json" Version="13.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
@@ -16,6 +15,7 @@
     <ProjectReference Include="..\lib\DBAccessLib\DBAccessLib.csproj" />
     <ProjectReference Include="..\lib\FlightLib\FlightLib.csproj" />
     <ProjectReference Include="..\lib\SearchZoneLib\SearchZoneLib.csproj" />
+    <ProjectReference Include="..\lib\ResponseJsonLib\ResponseJsonLib.csproj" />
   </ItemGroup>
 
 </Project>
