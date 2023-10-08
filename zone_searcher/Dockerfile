@@ -8,6 +8,7 @@ COPY zone_searcher/zone_searcher.csproj /app/zone_searcher/
 COPY lib/FlightLib/*.csproj lib/FlightLib/*.cs /app/lib/FlightLib/
 COPY lib/DBAccessLib/*.csproj lib/DBAccessLib/*.cs /app/lib/DBAccessLib/
 COPY lib/SearchZoneLib/*.csproj lib/SearchZoneLib/*.cs /app/lib/SearchZoneLib/
+COPY lib/ResponseJsonLib/*.csproj lib/ResponseJsonLib/*.cs /app/lib/ResponseJsonLib/
 WORKDIR /app
 RUN dotnet restore zone_searcher/zone_searcher.csproj
 
