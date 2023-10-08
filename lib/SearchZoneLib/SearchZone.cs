@@ -10,7 +10,6 @@ public class SearchZone
         Distance = distance;
         UserId = userid;
 
-        // TODO: Need better error handling here
         string[] point_parts = point.Split(',');
         Point = new GeoCoordinate(Convert.ToDouble(point_parts[0]), Convert.ToDouble(point_parts[1]));
     }
