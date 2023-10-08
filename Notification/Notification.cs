@@ -1,7 +1,5 @@
 using DBAccessLib;
 using FlightLib;
-using System.Net.Mail;
-using System.Net;
 
 namespace Notification;
 
