@@ -55,8 +55,10 @@ public class Function
             Console.WriteLine($"Called zone searcher service. Found {search_zone_resp["matchesFound"]!} matches");
         }
 
-        // TODO: Make this function report success or failure
-        return "{ statusCode : 200 }";
+        // AWS Lambda functions are typically designed to have output, but our use case has no useful output
+        // as it is not an API endpoint and is instead run on a schedule. Returning an empty string since
+        // we have to return something
+        return "";
     }
 
     static async Task<string> MakeRequestGetStr(string _base, string uri)
