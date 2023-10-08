@@ -38,7 +38,7 @@ public class EmailSender
                 From = new MailAddress("Planes@Overhead.com"),
                 Subject = email.Subject,
                 Body = email.Text,
-                IsBodyHtml = false, // TODO: Make the body look nicer
+                IsBodyHtml = true,
             };
             mailMessage.To.Add(email.Address);
 

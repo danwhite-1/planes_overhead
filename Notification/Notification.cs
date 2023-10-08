@@ -50,10 +50,24 @@ public static class Notifier
         DateTime time = DateTimeOffset.FromUnixTimeSeconds(timestamp).DateTime;
         string text = $"The following flights where detected in your search zone at {time.TimeOfDay} on {time.ToShortDateString()}:";
 
+        text += @$"{Environment.NewLine}<table style='border: 1px solid black;'>
+<tr style='border: 1px solid black;'>
+    <th style='border: 1px solid black; width: 80px;'>Callsign</th>
+    <th style='border: 1px solid black; width: 135px'>Ground Speed (kts)</th>
+    <th style='border: 1px solid black; width: 80px'>Altitude (m)</th>
+</tr>";
+
         foreach (var flight in flightInfo)
         {
-            text += $"{Environment.NewLine}{flight.Callsign}\t{flight.Velocity}kts @ {flight.Geo_altitude}m";
+            text += @$"
+<tr style='border: 1px solid black;'>
+    <td style='border: 1px solid black;'>{flight.Callsign}</td>
+    <td style='border: 1px solid black;' align='right'>{flight.Velocity}</td>
+    <td style='border: 1px solid black;' align='right'>{flight.Geo_altitude}</td>
+</tr>";
         }
+
+        text += "</table>";
         return text;
     }
 
