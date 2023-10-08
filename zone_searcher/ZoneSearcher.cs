@@ -1,7 +1,6 @@
 using System.Device.Location;
 using DBAccessLib;
 using SearchZoneLib;
-using ResponseJsonLib;
 
 namespace zone_searcher;
 
@@ -10,12 +9,12 @@ public static class ZoneSearcher
     public static string SearchZones(string timestamp)
     {
         var validInput = long.TryParse(timestamp, out long timestamp_l);
-        if (!validInput) { return GetResponseStr.ConstructErrResp(400, "The provided ts is not valid."); }
+        if (!validInput) { return new ZoneSearchResponse(400, "The provided ts is not valid.").ToJsonStr(); }
 
         DBAccess Db = new();
 
         var flights = Db.GetAllFlightsForTimestamp(timestamp_l);
-        if (flights.Count == 0) { return GetResponseStr.ConstructErrResp(400, "No flights found for provided timestamp."); }
+        if (flights.Count == 0) { return new ZoneSearchResponse(400, "No flights found for provided timestamp.").ToJsonStr(); }
 
         var zones = Db.GetAllSearchZones();
 
@@ -34,6 +33,6 @@ public static class ZoneSearcher
         }
 
         Db.WriteZoneMatchesToDB(matches);
-        return GetResponseStr.ConstructSuccessResp(matches.Count, flights.Count);
+        return new ZoneSearchResponse(matches.Count, flights.Count).ToJsonStr();
     }
 }

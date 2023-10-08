@@ -1,6 +1,5 @@
 using DBAccessLib;
 using FlightLib;
-using ResponseJsonLib;
 using System.Net.Mail;
 using System.Net;
 
@@ -8,11 +7,10 @@ namespace Notification;
 
 public static class Notifier
 {
-    //! TODO: Return json
     public static string DoNotifications(string timestamp)
     {
         var validInput = long.TryParse(timestamp, out long timestamp_l);
-        if (!validInput) { return GetResponseStr.ConstructErrResp(400, "The provided ts is not valid."); }
+        if (!validInput) { return new NotificationResponse(400, "The provided ts is not valid.").ToJsonStr(); }
 
         var db = new DBAccess();
         List<(int, int, int)> zonematchinfo = db.GetZoneMatchInfoForTimestamp(timestamp_l);
@@ -46,8 +44,7 @@ public static class Notifier
 
         SendEmails(emails);
 
-        // TODO: Update response class to version agnostic/innterface
-        return GetResponseStr.ConstructSuccessResp(0, 0);
+        return new NotificationResponse(emails.Count).ToJsonStr();
     }
 
     public static string ConstructEmailString(List<Flight> flightInfo, long timestamp)
