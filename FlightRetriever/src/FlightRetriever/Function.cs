@@ -44,8 +44,9 @@ public class Function
         }
 
         dbw.WriteFlightsToDB(flights, runtime_ts);
-        var search_zone_resp = JsonNode.Parse(await RequestSearchZones(runtime_ts))!;
 
+        // Save matches to DB
+        var search_zone_resp = JsonNode.Parse(await RequestSearchZones(runtime_ts))!;
         if (search_zone_resp["errMsg"]!.ToString() != "")
         {
             Console.WriteLine($"Zone searcher service hit error: {search_zone_resp["errMsg"]!}");
@@ -53,6 +54,17 @@ public class Function
         else
         {
             Console.WriteLine($"Called zone searcher service. Found {search_zone_resp["matchesFound"]!} matches");
+        }
+
+        // Send notifications for found matches
+        var notification_resp = JsonNode.Parse(await SendNotifications(runtime_ts))!;
+        if (notification_resp["errMsg"]!.ToString() != "")
+        {
+            Console.WriteLine($"Notification service hit error: {notification_resp["errMsg"]!}");
+        }
+        else
+        {
+            Console.WriteLine($"Called notification service. Sent {notification_resp["emailsSent"]!} notifications");
         }
 
         // AWS Lambda functions are typically designed to have output, but our use case has no useful output
@@ -92,5 +104,16 @@ public class Function
         }
 
         return "{\"errMsg\" : \"Env var ZONE_SEARCHER_URI does not exist\"}";
+    }
+
+    static async Task<string> SendNotifications(long timestamp)
+    {
+        var notification_uri = Environment.GetEnvironmentVariable("NOTIFICATION_URI");
+        if (!string.IsNullOrEmpty(notification_uri))
+        {
+            return await MakeRequestGetStr(notification_uri, $"notification?ts={timestamp}");
+        }
+
+        return "{\"errMsg\" : \"Env var NOTIFICATION_URI does not exist\"}";
     }
 }
