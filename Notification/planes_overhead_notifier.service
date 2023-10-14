@@ -1,0 +1,10 @@
+[Unit]
+Description=Daemon to run the email notification service for planes overhead
+
+[Service]
+# The environment file needs to contain details for DB and Email
+EnvironmentFile=/home/ec2-user/planes_overhead_notifier.env
+ExecStart=/usr/bin/dotnet /home/ec2-user/publish/Notification.dll --urls=http://0.0.0.0:80
+
+[Install]
+WantedBy=multi-user.target
