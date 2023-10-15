@@ -109,6 +109,7 @@ PRIMARY KEY (userid)";
 `point` VARCHAR(40) NOT NULL,
 `distance` INT NOT NULL,
 `userid` INT NOT NULL,
+`description` TEXT NOT NULL,
 PRIMARY KEY (searchzoneid),
 FOREIGN KEY (userid) REFERENCES users(userid)";
 
@@ -323,28 +324,43 @@ FOREIGN KEY (userid) REFERENCES users(userid)";
         throw new Exception("No search zone for that Id exists.");
     }
 
-    public List<(int, int, int)> GetZoneMatchInfoForTimestamp(long ts)
+    public List<(int, int)> GetZoneMatchInfoForTimestamp(long ts)
     {
         MySqlCommand cmd = conn.CreateCommand();
-        cmd.CommandText = @$"SELECT users.userid, zonematches.zonematchid, flights.flightid FROM users
-JOIN searchzones ON users.userid=searchzones.userid
+        cmd.CommandText = @$"SELECT searchzones.searchzoneid, flights.flightid FROM searchzones
 JOIN zonematches ON searchzones.searchzoneid=zonematches.zoneid
 JOIN flights ON zonematches.flightid=flights.flightid
 WHERE flights.query_timestamp=@ts";
         cmd.Parameters.AddWithValue("@ts", ts);
 
         MySqlDataReader reader = cmd.ExecuteReader();
-        var rtn_list = new List<(int, int, int)>();
+        var rtn_list = new List<(int, int)>();
         while (reader.Read())
         {
-            var userid = getValueFromReaderNullSafe<int>(reader, 0);
-            var zonematchid = getValueFromReaderNullSafe<int>(reader, 1);
-            var flightid = getValueFromReaderNullSafe<int>(reader, 2);
-            rtn_list.Add((userid, zonematchid, flightid));
+            var zonematchid = getValueFromReaderNullSafe<int>(reader, 0);
+            var flightid = getValueFromReaderNullSafe<int>(reader, 1);
+            rtn_list.Add((zonematchid, flightid));
         }
         reader.Close();
 
         return rtn_list;
+    }
+
+    public (int, string) GetSearchZoneInfoById(int id)
+    {
+        MySqlCommand cmd = conn.CreateCommand();
+        cmd.CommandText = @$"SELECT userid, description FROM searchzones where searchzoneid={id}";
+
+        MySqlDataReader reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            var userid = getValueFromReaderNullSafe<int>(reader, 0);
+            var description = getValueFromReaderNullSafeStr(reader, 1);
+            reader.Close();
+            return (userid, description);
+        }
+
+        throw new Exception($"Error: Unable to get searchzone info for id: {id}");
     }
 
     public string GetEmailAddressByUserId(int id)

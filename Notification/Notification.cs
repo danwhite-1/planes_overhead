@@ -11,33 +11,35 @@ public static class Notifier
         if (!validInput) { return new NotificationResponse(400, "The provided ts is not valid.").ToJsonStr(); }
 
         var db = new DBAccess();
-        List<(int, int, int)> zonematchinfo = db.GetZoneMatchInfoForTimestamp(timestamp_l);
+        List<(int, int)> zonematchinfo = db.GetZoneMatchInfoForTimestamp(timestamp_l);
 
-        var userFlightMap = new Dictionary<int, List<int>>();
+        var searchZoneFlightMap = new Dictionary<int, List<int>>();
         foreach (var zonematchi in zonematchinfo)
         {
-            if (!userFlightMap.ContainsKey(zonematchi.Item1))
+            if (!searchZoneFlightMap.ContainsKey(zonematchi.Item1))
             {
-                userFlightMap[zonematchi.Item1] = new List<int>{zonematchi.Item3};
+                searchZoneFlightMap[zonematchi.Item1] = new List<int>{zonematchi.Item2};
             }
             else
             {
-                userFlightMap[zonematchi.Item1].Add(zonematchi.Item3);
+                searchZoneFlightMap[zonematchi.Item1].Add(zonematchi.Item2);
             }
         }
 
         var emails = new List<Email>();
-        foreach (var user in userFlightMap)
+        foreach (var searchZoneMatch in searchZoneFlightMap)
         {
-            var flightInfo = db.GetFlightsByIds(user.Value);
-            var addr = db.GetEmailAddressByUserId(user.Key);
+            var flightInfo = db.GetFlightsByIds(searchZoneMatch.Value);
+            var zoneInfo = db.GetSearchZoneInfoById(searchZoneMatch.Key);
+            var addr = db.GetEmailAddressByUserId(zoneInfo.Item1);
+
             if (string.IsNullOrEmpty(addr))
             {
-                Console.WriteLine($"Found empty email address for user: {user.Key}");
+                Console.WriteLine($"Found empty email address for user: {zoneInfo.Item1}");
                 continue;
             }
 
-            emails.Add(new Email(addr, "Planes Overhead Report", ConstructEmailString(flightInfo, timestamp_l)));
+            emails.Add(new Email(addr, "Planes Overhead Report", ConstructEmailString(flightInfo, zoneInfo.Item2, timestamp_l)));
         }
 
         SendEmails(emails);
@@ -45,10 +47,10 @@ public static class Notifier
         return new NotificationResponse(emails.Count).ToJsonStr();
     }
 
-    public static string ConstructEmailString(List<Flight> flightInfo, long timestamp)
+    public static string ConstructEmailString(List<Flight> flightInfo, string zoneDescription, long timestamp)
     {
         DateTime time = DateTimeOffset.FromUnixTimeSeconds(timestamp).DateTime;
-        string text = $"The following flights where detected in your search zone at {time.TimeOfDay} on {time.ToShortDateString()}:";
+        string text = $"The following flights where detected in your search zone ({zoneDescription}) at {time.TimeOfDay} on {time.ToShortDateString()}:";
 
         text += @$"{Environment.NewLine}<table style='border: 1px solid black;'>
 <tr style='border: 1px solid black;'>
