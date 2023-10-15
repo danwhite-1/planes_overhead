@@ -56,7 +56,7 @@ public static class Notifier
 <tr style='border: 1px solid black;'>
     <th style='border: 1px solid black; width: 80px;'>Callsign</th>
     <th style='border: 1px solid black; width: 135px'>Ground Speed (kts)</th>
-    <th style='border: 1px solid black; width: 80px'>Altitude (m)</th>
+    <th style='border: 1px solid black; width: 80px'>Altitude (ft)</th>
 </tr>";
 
         foreach (var flight in flightInfo)
@@ -65,7 +65,7 @@ public static class Notifier
 <tr style='border: 1px solid black;'>
     <td style='border: 1px solid black;'>{flight.Callsign}</td>
     <td style='border: 1px solid black;' align='right'>{flight.Velocity}</td>
-    <td style='border: 1px solid black;' align='right'>{flight.Geo_altitude}</td>
+    <td style='border: 1px solid black;' align='right'>{m_to_ft(flight.Geo_altitude)}</td>
 </tr>";
         }
 
@@ -86,4 +86,6 @@ public static class Notifier
         var emailSender = new EmailSender(smtpServer, senderEmail, emailPassword);
         emailSender.SendEmails(emails);
     }
+
+    public static int m_to_ft(float? alt_m) { return Convert.ToInt32(alt_m * 3.28084); }
 }
